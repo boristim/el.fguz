@@ -12,7 +12,7 @@
 Страница для фрейма - /elereg
 
 /etc/supervisor/conf.d/erl.conf:
-```apacheconf
+```ini
 [program:erl]
 command=<SITE_PATH>/erl.sh
 autostart=true
