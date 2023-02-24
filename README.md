@@ -12,18 +12,17 @@
 Страница для фрейма - /elereg
 
 /etc/supervisor/conf.d/erl.conf:
-```
+```apacheconf
 [program:erl]
 command=<SITE_PATH>/erl.sh
 autostart=true
 autorestart=true
 stderr_logfile=/var/log/erl.err.log
 stdout_logfile=/var/log/erl.out.log
-user=root
 ```
 
 <SITE_PATH>/erl.sh:
-```
+```shell
 #!/bin/env sh
 cd <SITE_PATH> && /usr/bin/php8.1 vendor/bin/drush erl
 ```
