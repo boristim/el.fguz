@@ -1,0 +1,17 @@
+elereg.settings_form:
+  title: 'Электронная регистратура'
+  parent: system.admin_config_system
+  route_name: elereg.settings_form
+  weight: 10
+
+elereg.settings_sms_form:
+  title: 'Настройки SMS'
+  parent: elereg.settings_form
+  route_name: elereg.settings_sms_form
+  weight: 20
+
+elereg.settings_calendar:
+  title: 'Полный календарь'
+  parent: elereg.settings_form
+  route_name: elereg.settings_calendar
+  weight: 20

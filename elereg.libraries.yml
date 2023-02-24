@@ -1,0 +1,29 @@
+elereg:
+  version: VERSION
+  js:
+    js/elereg.js: { }
+  css:
+    component:
+      css/elereg.css: { }
+  dependencies:
+    - core/drupalSettings
+
+elereg_admin:
+  version: VERSION
+  js:
+    js/elereg_admin.js: { }
+  css:
+    component:
+      css/elereg_admin.css: { }
+  dependencies:
+    - core/drupalSettings
+
+elereg_admin_calendar:
+  version: VERSION
+  js:
+    js/elereg_admin_calendar.js: { }
+  css:
+    component:
+      css/elereg_admin_calendar.css: { }
+  dependencies:
+    - core/drupalSettings
