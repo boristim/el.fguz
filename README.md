@@ -1,5 +1,12 @@
+
 **Электронная регистратура**
 
+--------------------------------------------
+###### Requirements:
+* Drupal 10
+* php 8.1
+* RabbitMQ
+* Supervisor
 --------------------------------------------
 * Настройка календаря /admin/config/system/elereg
 * Настройка SMPP шлюза /admin/config/system/elereg/sms
