@@ -6,14 +6,22 @@ html {
     //font-family: Arial, sans-serif;
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: $font-size;
-    a{
+
+    a {
       outline: none;
     }
+
+
     .site-footer {
       background: transparent;
     }
-    iframe{
-      #header{
+    .page-wrapper,
+    .container {
+      max-width: 100%;
+    }
+
+    iframe {
+      #header {
         display: none;
         height: 0;
         width: 0;
@@ -21,6 +29,7 @@ html {
         overflow: hidden;
       }
     }
+
     .site-branding__slogan {
       font-style: normal;
       font-family: Arial, sans-serif;
@@ -84,6 +93,7 @@ html {
           background: white;
           border: 1px solid $dark-blue;
           border-collapse: collapse;
+
           tr {
             th, td {
               background: white;
@@ -99,6 +109,7 @@ html {
 
             td {
               padding: 4px 9px;
+
               label {
                 border: none;
                 padding: 0;
@@ -328,6 +339,7 @@ html {
       #main {
         .main-content {
           width: 100%;
+
           .main-content__container {
             padding-top: 0;
 
@@ -346,6 +358,7 @@ html {
             }
           }
         }
+
         .social-bar {
           display: none;
           width: 0;

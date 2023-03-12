@@ -4,17 +4,19 @@ namespace Drupal\elereg\Commands;
 
 use DateInterval;
 use DateTimeImmutable;
+use Dflydev\DotAccessData\Data;
 use Drupal;
+use Drupal\Core\Database\Database;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Site\Settings;
 use Drupal\elereg\SMSC_SMPP;
 use Drupal\node\Entity\Node;
 use Drupal\taxonomy\Entity\Term;
 use Drush\Commands\DrushCommands;
-use Error;
 use Exception;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
+use Throwable;
 
 class EleregCommands extends DrushCommands {
 
@@ -39,7 +41,6 @@ class EleregCommands extends DrushCommands {
 
   /**
    *
-   *
    * @command elereg:listen
    * @aliases erl
    * @usage elereg:listen [--force]
@@ -59,8 +60,8 @@ class EleregCommands extends DrushCommands {
         else {
           $this->output->writeln(' [!] Failed ' . $msg->body);
         }
-      } catch (Exception $e) {
-        Drupal::logger('SMS')->error($e->getMessage());
+      } catch (Throwable $e) {
+        Drupal::logger('SMS')->error($e);
       }
     };
     $channel->basic_consume($this->settings['rmq_name'], '', FALSE, TRUE, FALSE, FALSE, $callback);
@@ -80,7 +81,25 @@ class EleregCommands extends DrushCommands {
    */
   public function sendSMS(int $id): bool {
     $status = FALSE;
-    if ($registration = Node::load($id)) {
+    Drupal::logger('SMS')->info("Sending message: $id");
+    drupal_flush_all_caches();
+    try {
+      $query = Drupal::database()->query('Select nid from node where nid = :id limit 1', [':id' => $id]);
+      $query->fetchAll();
+    } catch (Throwable $e) {
+      Drupal::logger('SMS')->warning("Database not accessible");
+      try {
+        $connection = Database::getConnection('default');
+        if ($connection) {
+          Drupal::logger('SMS')->info("Database reconnect success: @info", ['@info' => print_r($connection->getConnectionOptions(), 1)]);
+        }
+      } catch (Throwable $e) {
+        Drupal::logger('SMS')->warning("Database reconnect failed: ".$e->getMessage());
+        $id = -1;
+      }
+    }
+    if (($id > 0) && ($registration = Node::load($id))) {
+      Drupal::logger('SMS')->info("Registration found: $id");
       $phone = '7' . $registration->get('field_tel')->getValue()[0]['value'];
       $title = t("SMS @tel, для регистрации #@id", ['@tel' => $phone, '@id' => $registration->id()]);
       $message = $this->composeMessage($registration);
@@ -89,15 +108,12 @@ class EleregCommands extends DrushCommands {
       $smsc = NULL;
       try {
         $smsc = Drupal::service('elereg.smsc_smpp');
-      } catch (Exception $e) {
-        Drupal::logger('SMS')->error($e->getMessage());
-      } catch (Error $e) {
-        Drupal::logger('SMS')->error($e->getMessage());
+      } catch (Throwable $e) {
+        Drupal::logger('SMS')->error($e);
       }
       if (!$smsc instanceof SMSC_SMPP) {
         throw new Exception('SMS transport is unreachable');
       }
-
       try {
         $h24 = time() - ($this->settings['period'] * 60);
         $query = Drupal::entityQuery('node')->condition('type', 'sms')->condition('created', $h24, '>')->condition('field_phone', $phone)->condition('field_status', TRUE)->accessCheck(FALSE);
@@ -107,21 +123,18 @@ class EleregCommands extends DrushCommands {
             $status = TRUE;
           }
           else {
-            Drupal::logger('SMS')->error('Ошибка отправки СМС на %s', ['%s' => $phone]);
+            Drupal::logger('SMS')->warning('Не удалось отправить СМС на %s', ['%s' => $phone]);
           }
         }
         else {
-          Drupal::logger('SMS')->info('СМС на номер %s послана менее чем минуту назад', ['%s' => $phone]);
+          Drupal::logger('SMS')->warning('СМС на номер %s уже была послана менее чем минуту назад', ['%s' => $phone]);
         }
-      } catch (Exception $e) {
-        Drupal::logger('SMS')->error($e->getMessage());
-      } catch (Error $e) {
-        Drupal::logger('SMS')->error($e->getMessage());
+      } catch (Throwable $e) {
+        Drupal::logger('SMS')->error($e);
       } finally {
+        $node->set('field_status', $status)->save();
         unset($smsc);
       }
-
-      $node->set('field_status', $status)->save();
     }
     return $status;
   }

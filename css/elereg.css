@@ -9,6 +9,10 @@ html body a {
 html body .site-footer {
   background: transparent;
 }
+html body .page-wrapper,
+html body .container {
+  max-width: 100%;
+}
 html body iframe #header {
   display: none;
   height: 0;

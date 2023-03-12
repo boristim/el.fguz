@@ -34,7 +34,7 @@ class EleregController extends ControllerBase
 
         return $build;
     }
-// http://fguz-tyumen.ru/about/plat-uslugi/
+
     /**
      * @return array
      */
@@ -46,21 +46,20 @@ class EleregController extends ControllerBase
             '#attached' => [
                 'drupalSettings' => [
                     'elereg' => ['endPoint' => '/elereg/ajax', 'rootElement' => '#page-wrapper'],
-//                    'elereg' => ['endPoint' => '/elereg/ajax', 'rootElement' => '.column.main-content'],
                 ],
             ],
         ];
         return $build;
     }
 
-    /**
-     * @param \Symfony\Component\HttpFoundation\Request $request
-     *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
-     * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
-     * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
-     * @throws \Drupal\Core\Entity\EntityStorageException
-     */
+  /**
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *
+   * @return \Symfony\Component\HttpFoundation\JsonResponse
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   * @throws \Exception
+   */
     public function ajax(Request $request): JsonResponse
     {
         $data = [];
