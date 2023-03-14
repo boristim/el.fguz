@@ -81,7 +81,7 @@ class EleregCommands extends DrushCommands {
    */
   public function sendSMS(int $id): bool {
     $status = FALSE;
-    Drupal::logger('SMS')->info("Sending message: $id");
+    //    Drupal::logger('SMS')->info("Sending message: $id");
     drupal_flush_all_caches();
     try {
       $query = Drupal::database()->query('Select nid from node where nid = :id limit 1', [':id' => $id]);
@@ -94,12 +94,11 @@ class EleregCommands extends DrushCommands {
           Drupal::logger('SMS')->info("Database reconnect success: @info", ['@info' => print_r($connection->getConnectionOptions(), 1)]);
         }
       } catch (Throwable $e) {
-        Drupal::logger('SMS')->warning("Database reconnect failed: ".$e->getMessage());
+        Drupal::logger('SMS')->warning("Database reconnect failed: " . $e->getMessage());
         $id = -1;
       }
     }
     if (($id > 0) && ($registration = Node::load($id))) {
-      Drupal::logger('SMS')->info("Registration found: $id");
       $phone = '7' . $registration->get('field_tel')->getValue()[0]['value'];
       $title = t("SMS @tel, для регистрации #@id", ['@tel' => $phone, '@id' => $registration->id()]);
       $message = $this->composeMessage($registration);
@@ -127,7 +126,7 @@ class EleregCommands extends DrushCommands {
           }
         }
         else {
-          Drupal::logger('SMS')->warning('СМС на номер %s уже была послана менее чем минуту назад', ['%s' => $phone]);
+          Drupal::logger('SMS')->warning('СМС на номер %s уже была послана менее чем %min минут(у|ы) назад', ['%s' => $phone, '%min' => $this->settings['period']]);
         }
       } catch (Throwable $e) {
         Drupal::logger('SMS')->error($e);
@@ -135,6 +134,9 @@ class EleregCommands extends DrushCommands {
         $node->set('field_status', $status)->save();
         unset($smsc);
       }
+    }
+    else {
+      Drupal::logger('SMS')->warning("Registration not found: $id");
     }
     return $status;
   }
