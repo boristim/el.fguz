@@ -100,7 +100,7 @@ class EleregCommands extends DrushCommands {
     }
     if (($id > 0) && ($registration = Node::load($id))) {
       $phone = '7' . $registration->get('field_tel')->getValue()[0]['value'];
-      $title = t("SMS @tel, для регистрации #@id", ['@tel' => $phone, '@id' => $registration->id()]);
+      $title = t("SMS @tel для регистрации @id", ['@tel' => $phone, '@id' => $registration->id()]);
       $message = $this->composeMessage($registration);
       $node = Node::create(['type' => 'sms', 'title' => $title]);
       $node->set('body', $message)->set('field_phone', $phone)->set('field_status', FALSE)->save();

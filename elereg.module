@@ -8,14 +8,18 @@
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\node\Entity\Node;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
  * Implements hook_form_alter().
  */
 function elereg_form_alter(&$form, FormStateInterface $form_state, $form_id): void {
-  $dtForms = ['views-exposed-form-departures-page-1', 'views-exposed-form-registrations-page-1'];
+  $dtForms = ['views-exposed-form-departures-page-1', 'views-exposed-form-registrations-page-1', 'views-exposed-form-mites-page-1'];
+
   if (($form_id == 'views_exposed_form') && (in_array($form['#id'], $dtForms))) {
     $form['#attached']['library'][] = 'elereg/elereg_admin';
+    $form['dt_wrapper']['dt']['min']['#title'] = t('Date from');
+    $form['dt_wrapper']['dt']['max']['#title'] = t('Date to');
     $form['dt_wrapper']['dt']['max']['#type'] = $form['dt_wrapper']['dt']['min']['#type'] = 'datetime';
     $form['dt_wrapper']['dt']['max']['#date_date_element'] = $form['dt_wrapper']['dt']['min']['#date_date_element'] = 'date';
     $form['dt_wrapper']['dt']['max']['#date_time_element'] = $form['dt_wrapper']['dt']['min']['#date_time_element'] = 'time';
@@ -23,9 +27,15 @@ function elereg_form_alter(&$form, FormStateInterface $form_state, $form_id): vo
     $userInput = $form_state->getUserInput();
     if (!isset($userInput['dt'])) {
       $day = time();
-      $curDay = intval(date('w', $day)) - 1;
-      $startDate = DrupalDateTime::createFromTimestamp(strtotime('-' . $curDay . ' days', $day))->format('Y-m-d') . ' 00:00:00';
-      $stopDate = DrupalDateTime::createFromTimestamp(strtotime('+' . (6 - $curDay) . ' days', $day))->format('Y-m-d') . ' 23:59:59';
+      if ('views-exposed-form-mites-page-1' == $form['#id']) {
+        $startDate = DrupalDateTime::createFromTimestamp(strtotime(date('Y-m') . '-01'))->format('Y-m-d') . ' 00:00:00';
+        $stopDate = DrupalDateTime::createFromTimestamp(strtotime(date('Y-m-t')))->format('Y-m-d') . ' 23:59:59';
+      }
+      else {
+        $curDay = intval(date('w', $day)) - 1;
+        $startDate = DrupalDateTime::createFromTimestamp(strtotime('-' . $curDay . ' days', $day))->format('Y-m-d') . ' 00:00:00';
+        $stopDate = DrupalDateTime::createFromTimestamp(strtotime('+' . (6 - $curDay) . ' days', $day))->format('Y-m-d') . ' 23:59:59';
+      }
       $startDate = DrupalDateTime::createFromFormat('Y-m-d H:i:s', $startDate);
       $stopDate = DrupalDateTime::createFromFormat('Y-m-d H:i:s', $stopDate);
       $form['dt_wrapper']['dt']['min']['#value']['object'] = $startDate;
@@ -37,7 +47,6 @@ function elereg_form_alter(&$form, FormStateInterface $form_state, $form_id): vo
     }
   }
 }
-
 
 /**
  * Implements hook_form_FORM_ID_alter().
@@ -62,24 +71,75 @@ function elereg_form_views_exposed_form_alter(&$form, FormStateInterface $form_s
  */
 function elereg_page_attachments(array &$attachments) {
   $attachments['#attached']['library'][] = 'elereg/elereg';
+
+  $mites = ['/node/add/mites', '/admin/mites'];
+  if (in_array(\Drupal::service('path.current')->getPath(), $mites)) {
+    $attachments['#attached']['library'][] = 'elereg/elereg_mite';
+  }
 }
 
-function elereg_form_node_mites_form_alter(&$form, FormStateInterface $formState, $form_id): void {
-  unset($form['actions']['preview']);
+/**
+ * Implements hook_preprocess_HOOK().
+ */
+function elereg_preprocess_html(&$variables) {
+  $system_path = \Drupal::service('path.current')->getPath();
+  $variables['elereg_classes'] = 'elereg-' . implode('-', explode('/', $system_path));
+}
 
-  //  if (($mites = Drupal::entityQuery('mite')->sort('mite_reg_no','desc')->range(0,1)->execute()) && (count($regQ))) {
-  //    $regNo = intval(Node::load(reset($mites))->get('mite_reg_no')->getValue());
-  if (($query = Drupal::database()->query('Select max(field_mite_reg_no_value) as no from node__field_mite_reg_no')) && ($regQ = $query->fetchAssoc())) {
-    $regNo = intval($query->fetchAssoc()['no']) + 1;
+
+function elereg_form_node_mites_form_alter(&$form, FormStateInterface $formState, $form_id): void {
+  if (($query = Drupal::database()->query('Select max(field_mite_reg_no_value) as no from node__field_mite_reg_no')) && ($regNo = $query->fetchAssoc())) {
+    $regNo = intval(is_array($regNo) ? $regNo['no'] : 1000) + 1;
   }
   if ($regNo < 1000) {
     $regNo = 1001;
   }
   $regNo = sprintf('%06.0d', $regNo);
-  //  $query
-  //  dump($query);
   $form['field_mite_reg_no']['widget'][0]['value']['#default_value'] = $regNo;
+  $form['research'] = [
+    '#type' => 'fieldset',
+    '#title' => t('Research results'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+    '#weight' => 14,
+    [
+      'field_immunoglobulin' => $form['field_immunoglobulin'],
+      'field_vke' => $form['field_vke'],
+      'field_ikb' => $form['field_ikb'],
+      'field_gach' => $form['field_gach'],
+      'field_mech' => $form['field_mech'],
+    ],
+  ];
+  $form['actions']['submit']['#submit'][] = '_elereg_mite_submit';
+  $form['actions']['submitAndAdd'] = [
+    '#submit' => [
+      '::submitForm',
+      '::save',
+      '_elereg_mite_submit_and_add',
+    ],
+    '#type' => 'submit',
+    '#value' => t('Save and add new'),
+    '#access' => TRUE,
+    '#button_type' => 'primary',
+    '#weight' => 10,
+  ];
+  unset($form['field_immunoglobulin']);
+  unset($form['field_vke']);
+  unset($form['field_ikb']);
+  unset($form['field_gach']);
+  unset($form['field_mech']);
+  $form['revision_log']['widget'][0]['value']['#placeholder'] = t('Not required');
+  $form['revision_log']['widget'][0]['value']['#rows'] = 2;
+  //  dump($form);
+}
 
-//  dump($form);
-//  $formState->set('field_mite_reg_no', $regNo);
+
+function _elereg_mite_submit() {
+  (new RedirectResponse('/admin/mites'))->send();
+  exit();
+}
+
+function _elereg_mite_submit_and_add() {
+  (new RedirectResponse('/node/add/mites'))->send();
+  exit();
 }

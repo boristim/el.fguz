@@ -5,6 +5,22 @@ elereg.main:
   requirements:
     _permission: 'access content'
 
+elereg.mites.export:
+  methods: ['GET']
+  path: '/admin/mites/xls'
+  defaults:
+    _controller: '\Drupal\elereg\Controller\EleregController::mitesXls'
+  requirements:
+    _permission: 'elereg xls export mites'
+
+elereg.mites.import:
+  methods: ['POST']
+  path: '/admin/mites/xls'
+  defaults:
+    _controller: '\Drupal\elereg\Controller\EleregController::mitesXls'
+  requirements:
+    _permission: 'elereg xls import mites'
+
 elereg.ajax:
   path: '/elereg/ajax'
   defaults:

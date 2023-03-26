@@ -27,3 +27,11 @@ elereg_admin_calendar:
       css/elereg_admin_calendar.css: { }
   dependencies:
     - core/drupalSettings
+
+elereg_mite:
+  version: VERSION
+  js:
+    js/elereg_mites.js: { }
+  css:
+    component:
+      css/elereg_mite.css: { }

@@ -4,6 +4,12 @@ services:
     tags:
       - { name: elereg.calendar }
 
+  elereg.mites:
+    arguments: [ '@renderer' ,'@file_system', '@file.repository' ]
+    class: Drupal\elereg\Mites
+    tags:
+      - { name: elereg.mites }
+
   elereg.smpp:
     class: Drupal\elereg\Smpp
     tags:

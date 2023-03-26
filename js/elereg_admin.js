@@ -1,5 +1,5 @@
-/*jshint esversion: 6 */
-((settings) => {
+/*jshint esversion: 11 */
+(() => {
     const formHolidaysAlter = {
         form: {},
         title: {},
@@ -7,7 +7,7 @@
         init: function () {
             this.form = document.getElementById('node-holidays-form') ?? document.getElementById('node-holidays-edit-form')
             if(!this.form){
-                console.log('form not found')
+                // console.log('form not found')
                 return false
             }
             this.title = this.form.querySelector('input[name^=title]')
@@ -38,5 +38,5 @@
     }
     let eleregHolidaysForm = Object.create(formHolidaysAlter)
     eleregHolidaysForm.init()
-    console.log(settings)
+
 })(drupalSettings)
