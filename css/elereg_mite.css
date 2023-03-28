@@ -32,7 +32,6 @@ html body .elereg-mite-popup-inner {
   padding: 1em;
 }
 html body .elereg-mite-popup-inner {
-  overflow: scroll;
   overflow-y: scroll;
   overflow-x: revert;
 }
