@@ -36,7 +36,7 @@ trait XlsExport {
       $resultXmlFile = sprintf('%s/%s_%s', $directory, $dt['min']['date'], $dt['max']['date']) . '.xlsx';
       $reader = new HtmlReader();
       try {
-        $spreadsheet = $reader->loadFromString($html);
+        $spreadsheet = @$reader->loadFromString($html);
         $writer = new XlsxWriter($spreadsheet);
         $writer->save($resultXmlFile);
       } catch (Exception $e) {

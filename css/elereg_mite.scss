@@ -7,6 +7,9 @@ html {
       }
     }
 
+    .elereg-mite-popup-close,
+    .elereg-mite-popup-inner,
+    .elereg-mite-popup,
     .elereg-throbber {
       top: 0;
       left: 0;
@@ -17,6 +20,43 @@ html {
       background: url(../assets/throbber.gif) center center no-repeat black;
       opacity: 0.5;
       z-index: 1000;
+    }
+
+    .elereg-mite-popup {
+      background-image: none;
+    }
+
+    .elereg-mite-popup-close,
+    .elereg-mite-popup-inner {
+      width: 80%;
+      height: 50%;
+      top: 25%;
+      left: 10%;
+      border: 1px solid black;
+      background: white;
+      opacity: 1;
+      z-index: 2000;
+      padding: 1em;
+    }
+
+    .elereg-mite-popup-inner {
+      overflow: scroll;
+      overflow-y: scroll;
+      overflow-x: revert;
+    }
+
+    .elereg-mite-popup-close {
+      border: none;
+      display: block;
+      left: auto;
+      right: 10%;
+      width: auto;
+      height: auto;
+      font-weight: bold;
+      font-size: 125%;
+      background: transparent;
+      z-index: 2010;
+      cursor: pointer;
     }
 
     &.elereg--admin-mites {

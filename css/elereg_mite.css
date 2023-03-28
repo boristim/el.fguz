@@ -2,6 +2,9 @@ html body #node-mites-form textarea {
   height: 5em;
   min-height: 5em;
 }
+html body .elereg-mite-popup-close,
+html body .elereg-mite-popup-inner,
+html body .elereg-mite-popup,
 html body .elereg-throbber {
   top: 0;
   left: 0;
@@ -12,6 +15,39 @@ html body .elereg-throbber {
   background: url(../assets/throbber.gif) center center no-repeat black;
   opacity: 0.5;
   z-index: 1000;
+}
+html body .elereg-mite-popup {
+  background-image: none;
+}
+html body .elereg-mite-popup-close,
+html body .elereg-mite-popup-inner {
+  width: 80%;
+  height: 50%;
+  top: 25%;
+  left: 10%;
+  border: 1px solid black;
+  background: white;
+  opacity: 1;
+  z-index: 2000;
+  padding: 1em;
+}
+html body .elereg-mite-popup-inner {
+  overflow: scroll;
+  overflow-y: scroll;
+  overflow-x: revert;
+}
+html body .elereg-mite-popup-close {
+  border: none;
+  display: block;
+  left: auto;
+  right: 10%;
+  width: auto;
+  height: auto;
+  font-weight: bold;
+  font-size: 125%;
+  background: transparent;
+  z-index: 2010;
+  cursor: pointer;
 }
 html body.elereg--admin-mites .grid-full {
   display: block !important;
