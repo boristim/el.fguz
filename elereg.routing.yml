@@ -6,7 +6,7 @@ elereg.main:
     _permission: 'access content'
 
 elereg.mites.export:
-  methods: ['GET']
+  methods: [ 'GET' ]
   path: '/admin/mites/xls'
   defaults:
     _controller: '\Drupal\elereg\Controller\EleregController::mitesXls'
@@ -14,7 +14,7 @@ elereg.mites.export:
     _permission: 'elereg xls export mites'
 
 elereg.mites.import:
-  methods: ['POST']
+  methods: [ 'POST' ]
   path: '/admin/mites/xls'
   defaults:
     _controller: '\Drupal\elereg\Controller\EleregController::mitesXls'
@@ -27,6 +27,16 @@ elereg.ajax:
     _controller: '\Drupal\elereg\Controller\EleregController::ajax'
   requirements:
     _permission: 'access content'
+  options:
+    no_cache: TRUE
+
+elereg.mites.sms:
+  methods: [ 'PUT','POST' ]
+  path: '/admin/mites/sms'
+  defaults:
+    _controller: '\Drupal\elereg\Controller\EleregController::mitesSMS'
+  requirements:
+    _permission: 'elereg xls import mites'
   options:
     no_cache: TRUE
 

@@ -1,25 +1,24 @@
 /*jshint esversion: 11 */
-(() => {
-  let exportLink = document.querySelector('.mites-export')
+((d) => {
+  let exportLink = d.querySelector('.mites-export')
   if (exportLink) {
-    exportLink.href = document.location.toString().replace('/admin/mites', '/admin/mites/xls')
+    exportLink.href = d.location.toString().replace('/admin/mites', '/admin/mites/xls')
   }
-  let importLink = document.querySelector('.mites-import')
+  let importLink = d.querySelector('.mites-import')
   if (importLink) {
     importLink.addEventListener('click', () => {
-      let fileField = document.querySelector('input[name=mitesXls]')
-
+      let fileField = d.querySelector('input[name=mitesXls]')
       if (null === fileField) {
-        fileField = document.createElement('INPUT')
+        fileField = d.createElement('INPUT')
         fileField.setAttribute('name', 'mitesXls')
         fileField.setAttribute('type', 'file')
         fileField.setAttribute('accept', '.xlsx,.ods')
         fileField.addEventListener('change', () => {
           if (fileField.files.length > 0) {
-            let throbber = Object.create(Throbber)
-            throbber.start()
             let data = new FormData()
             data.append('files', fileField.files[0], fileField.files[0].name)
+            let throbber = Object.create(Throbber)
+            throbber.start()
             let popup = Object(DisplayMessage)
             fetch('/admin/mites/xls', {
               method: 'POST',
@@ -39,7 +38,87 @@
       fileField.click()
     })
   }
-})(drupalSettings)
+  let header = d.querySelector('.view-mites .view-header')
+  if (header) {
+    let regNoHeader = d.querySelector('th.views-field-field-mite-reg-no')
+    if (regNoHeader) {
+      let chk = d.createElement('INPUT')
+      chk.setAttribute('type', 'checkbox')
+      chk.addEventListener('click', (event) => {
+        let ch = event.currentTarget.checked
+        d.querySelectorAll('.chk-no').forEach((item) => {
+          item.checked = ch
+          if (ch) {
+            item.setAttribute('checked', 'checked')
+          }
+          else {
+            item.removeAttribute('checked')
+          }
+        })
+        return true
+      })
+      regNoHeader.appendChild(chk)
+      let regNo = d.querySelectorAll('td.views-field-field-mite-reg-no')
+      if (regNo) {
+        regNo.forEach((item) => {
+          let chk = d.createElement('INPUT')
+          chk.setAttribute('type', 'checkbox')
+          chk.classList.add('chk-no')
+          chk.setAttribute('name', 's[' + item.innerText + ']')
+          item.appendChild(chk)
+        })
+        let btn = d.createElement('A')
+        btn.classList.add('button--primary')
+        btn.classList.add('form-submit')
+        btn.classList.add('button')
+        btn.href = '#'
+        btn.innerText = 'Отправить SMS выбранным'
+        btn.addEventListener('click', () => {
+          let chkS = d.querySelectorAll('.chk-no:checked')
+          if (!chkS.length) {
+            return false
+          }
+          let data = new FormData()
+          chkS.forEach((item) => {
+            data.append(item.getAttribute('name'), item.getAttribute('name').replace('s[', '').replace(']', ''))
+          })
+          let throbber = Object.create(Throbber)
+          throbber.start()
+          fetch('/admin/mites/sms', {
+            method: 'POST',
+            body: data
+          })
+            .then(response => {
+              // console.log(response.status)
+              if (response.status !== 200) {
+                return {'log': 'Some error'}
+              }
+              return response.json()
+            })
+            .then(resp => {
+              throbber.stop()
+              if (resp.hasOwnProperty('sent')) {
+                resp.sent.forEach((item) => {
+                  let inp = d.querySelector(`input[name="${item}"]`)
+                  // console.log(inp)
+                  if (inp) {
+                    inp.removeAttribute('checked')
+                    inp.checked = false
+                  }
+                })
+              }
+            })
+            .catch((reason) => {
+              throbber.stop()
+              console.warn(reason)
+            })
+          return false;
+        })
+        header.appendChild(btn)
+      }
+    }
+  }
+})(document)
 
 const Throbber = {
   throbber: null,

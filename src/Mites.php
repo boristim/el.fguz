@@ -37,7 +37,7 @@ class Mites {
     if ($uri = $this->generateXls($request)) {
       $fn = str_replace(['public:/', '/' . date('Y-m') . '/'], '', $uri);
       $headers = [
-        'Content-Type' => 'application/pdf',
+        'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         'Content-Disposition' => 'attachment;filename="' . $fn . '"',
       ];
       return (new BinaryFileResponse($uri, 200, $headers, TRUE));
@@ -46,7 +46,7 @@ class Mites {
   }
 
   public function importXls(Request $request): Response {
-    $resp['dbg'] = __FILE__;
+    $resp = [];
     /**
      * @var $files \Symfony\Component\HttpFoundation\File\UploadedFile
      */

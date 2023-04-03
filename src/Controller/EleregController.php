@@ -4,6 +4,7 @@ namespace Drupal\elereg\Controller;
 
 
 use Drupal;
+use Drupal\node\Entity\Node;
 use Drupal\elereg\{Mites, Smpp};
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\elereg\Trait\{EleregTrait, RegistrationTrait};
@@ -101,6 +102,29 @@ class EleregController extends ControllerBase {
     else {
       return new NotFoundHttpException();
     }
+  }
+
+  /**
+   * @throws \Exception
+   */
+  public function mitesSMS(Request $request): Response {
+    $items = $request->get('s');
+    $sent = [];
+    if (is_array($items)) {
+      /**
+       * @var Smpp $smpp
+       */
+      $smpp = Drupal::service('elereg.smpp');
+      foreach ($items as $regNo => $state) {
+        if ($regNo == $state) {
+          if (($miteIds = Drupal::entityQuery('node')->condition('type', 'mites')->condition('field_mite_reg_no', $regNo)->accessCheck(FALSE)->execute()) && ($mite = Node::load(reset($miteIds)))) {
+            $smpp->sendMessage($mite);
+            $sent[] = "s[$regNo]";
+          }
+        }
+      }
+    }
+    return (new JsonResponse())->setData(['log' => $items, 'sent' => $sent]);
   }
 
 }

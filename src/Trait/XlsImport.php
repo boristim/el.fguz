@@ -2,6 +2,7 @@
 
 namespace Drupal\elereg\Trait;
 
+use DateInterval;
 use DateTimeImmutable;
 use Drupal;
 use Drupal\Core\Entity\EntityStorageException;
@@ -77,7 +78,7 @@ trait XlsImport {
       $format = 'Y-m-d';
     }
     else {
-      $res = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $res)->sub(new \DateInterval('PT5H'));
+      $res = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $res)->sub(new DateInterval('PT5H'));
     }
     return $res->format($format);
   }
@@ -179,7 +180,7 @@ trait XlsImport {
       }
     }
     if ((!$break) && (count($nodeValues) == (count($this->fieldNames()) - 1))) {
-      $mites = Drupal::entityQuery('node')->condition('type', 'mites')->condition('field_mite_reg_no', $row[1])->accessCheck()->execute();
+      $mites = Drupal::entityQuery('node')->condition('type', 'mites')->condition('field_mite_reg_no', $row[1])->accessCheck(FALSE)->execute();
       if (count($mites)) {
         $miteId = reset($mites);
         $miteNode = Node::load($miteId);
