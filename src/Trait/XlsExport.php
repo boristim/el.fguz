@@ -25,6 +25,8 @@ trait XlsExport {
       if (preg_match('/<div class="view-content">(.*)<\/div>/isU', $html, $matches)) {
         $html = $matches[1];
       }
+      $html = str_replace('[e]', '', $html);
+//      $html = preg_replace('/<a href="\/node\/\d+/edit\?destination=\/admin\/mites" hreflang="ru">\[e]<\/a>/isU', '', $html);
       $directory = 'public://' . date('Y-m') . '/report';
       $this->fileSystem->prepareDirectory($directory, FileSystemInterface::CREATE_DIRECTORY);
       if (($get = $request->query->all()) && array_key_exists('dt', $get) && is_array($get['dt'])) {

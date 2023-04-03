@@ -6,8 +6,8 @@
  */
 
 use Drupal\Core\Datetime\DrupalDateTime;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\node\Entity\Node;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
@@ -62,18 +62,14 @@ function elereg_form_node_holidays_edit_form_alter(&$form, FormStateInterface $f
   $form['#attached']['library'][] = 'elereg/elereg_admin';
 }
 
-
-function elereg_form_views_exposed_form_alter(&$form, FormStateInterface $form_state, $form_id): void {
-}
-
 /**
  * Implements hook_page_attachments().
  */
-function elereg_page_attachments(array &$attachments) {
+function elereg_page_attachments(array &$attachments): void {
   $attachments['#attached']['library'][] = 'elereg/elereg';
 
   $mites = ['/node/add/mites', '/admin/mites'];
-  if (in_array(\Drupal::service('path.current')->getPath(), $mites)) {
+  if (in_array(Drupal::service('path.current')->getPath(), $mites)) {
     $attachments['#attached']['library'][] = 'elereg/elereg_mite';
   }
 }
@@ -81,13 +77,14 @@ function elereg_page_attachments(array &$attachments) {
 /**
  * Implements hook_preprocess_HOOK().
  */
-function elereg_preprocess_html(&$variables) {
-  $system_path = \Drupal::service('path.current')->getPath();
+function elereg_preprocess_html(&$variables): void {
+  $system_path = Drupal::service('path.current')->getPath();
   $variables['elereg_classes'] = 'elereg-' . implode('-', explode('/', $system_path));
 }
 
 
 function elereg_form_node_mites_form_alter(&$form, FormStateInterface $formState, $form_id): void {
+  $regNo = 0;
   if (($query = Drupal::database()->query('Select max(field_mite_reg_no_value) as no from node__field_mite_reg_no')) && ($regNo = $query->fetchAssoc())) {
     $regNo = intval(is_array($regNo) ? $regNo['no'] : 1000) + 1;
   }
@@ -142,4 +139,30 @@ function _elereg_mite_submit() {
 function _elereg_mite_submit_and_add() {
   (new RedirectResponse('/node/add/mites'))->send();
   exit();
+}
+
+
+/**
+ * Implements hook_ENTITY_TYPE_update().
+ *
+ * @throws \Exception
+ */
+function elereg_node_update(EntityInterface $entity): void {
+  $type = $entity->get('type')->getValue();
+  if (is_array($type) && array_key_exists('target_id', $type['0']) && ('mites' == $type[0]['target_id'])) {
+    $no = $entity->get('field_mite_reg_no')->getValue()[0]['value'];
+    $mites = Drupal::entityQuery('node')->condition('type', 'mites')->condition('field_mite_reg_no', $no)->accessCheck(FALSE)->execute();
+    if (count($mites)) {
+      if ($entity->id() != reset($mites)) {
+        throw new Exception(t('Duplicated value Reg No: @no', ['@no' => $no]));
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_create().
+ */
+function elereg_node_create(EntityInterface $entity): void {
+  elereg_node_update($entity);
 }

@@ -190,7 +190,6 @@ class SettingsCalendar extends ConfigFormBase {
 
   /**
    * {@inheritdoc}
-   * @throws \Drupal\Core\Entity\EntityStorageException
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $values = $form_state->getUserInput();
