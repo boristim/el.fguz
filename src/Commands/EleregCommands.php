@@ -4,6 +4,8 @@ namespace Drupal\elereg\Commands;
 
 use Drupal;
 
+
+use Drupal\node\Entity\Node;
 use Exception;
 use Throwable;
 
@@ -11,11 +13,13 @@ use Drupal\Core\Site\Settings;
 use Drush\Commands\DrushCommands;
 use PhpAmqpLib\Message\AMQPMessage;
 use Drupal\elereg\Trait\SMSRMQTrait;
+use Drupal\elereg\Trait\TelegramRMQTrait;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 
 class EleregCommands extends DrushCommands {
 
   use SMSRMQTrait;
+  use TelegramRMQTrait;
 
   private array $settings;
 
@@ -49,14 +53,21 @@ class EleregCommands extends DrushCommands {
     $channel->queue_declare($this->settings['rmq_name'], FALSE, FALSE, FALSE, FALSE);
     $this->output->writeln(date('Y-m-d H:i:s') . ": [*] Waiting for messages. To exit press CTRL+C");
     $callback = function (AMQPMessage $msg) {
+      $nodeId = intval($msg->body);
       try {
-        if ($this->sendSMS(intval($msg->body))) {
+        $document = Node::load($nodeId);
+        $message = $this->composeMessage($document);
+        $this->sendTg($message);
+      } catch (Throwable $e) {
+        Drupal::logger('SMS:Telegram')->error($e->getMessage());
+      }
+      try {
+        if ($this->sendSMS($nodeId)) {
           $this->output->writeln(date('Y-m-d H:i:s') . ': [x] Received ' . $msg->body);
         }
         else {
           $this->output->writeln(date('Y-m-d H:i:s') . ': [!] Failed ' . $msg->body);
         }
-
       } catch (Throwable $e) {
         Drupal::logger('SMS')->error($e);
       }
@@ -65,7 +76,7 @@ class EleregCommands extends DrushCommands {
 
     while ($channel->is_open()) {
       $channel->wait();
-      sleep(5);
+      sleep(1);
     }
 
     $channel->close();

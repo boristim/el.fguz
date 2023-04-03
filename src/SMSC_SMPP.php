@@ -121,6 +121,7 @@ class SMSC_SMPP
     public function send_sms($phone, $message, $sender = ".", $valid = "", $use_tlv = true, $time = "")
     {
         if (preg_match('/[`\x80-\xff]/', $message)) { // is UCS chars
+
             $message = iconv(SMSC_CHARSET, "UTF-16BE", $message);
             $coding = 2; // UCS2
         } else {

@@ -41,7 +41,6 @@ trait SMSRMQTrait {
     }
     if (($id > 0) && ($document = Node::load($id))) {
       $entity_type = $document->getType();
-      //      $phone = '7' . $document->get('field_tel')->getValue()[0]['value'];
       $phone = '7' . $document->get('registration' == $entity_type ? 'field_tel' : 'field_phone')->getValue()[0]['value'];
       $title = t("SMS @tel for @entity_type(@id)", ['@tel' => $phone, '@id' => $document->id(), '@entity_type' => $entity_type]);
       $message = $this->composeMessage($document);
@@ -86,10 +85,17 @@ trait SMSRMQTrait {
 
   private function composeMessage(Node $document): string {
     $methodName = "composeMessage_" . $document->getType();
+    $result = 'empty';
     if (method_exists($this, $methodName)) {
-      return $this->$methodName($document);
+      $result = $this->$methodName($document);
     }
-    return $this->composeMessage_default();
+    else {
+      $result = $this->composeMessage_default();
+    }
+    //    $result =
+    return $result;
+    //    return Drupal::transliteration()->transliterate($result, 'ru');
+    //    return transliterator_transliterate($result);
   }
 
   private function composeMessage_default(): string {
@@ -109,8 +115,8 @@ trait SMSRMQTrait {
         $notFound[] = $title;
       }
     }
-    $notFound = count($notFound) > 0 ? PHP_EOL . (implode(',', $notFound) . t(' - not found')) : '';
-    $found = count($found) > 0 ? PHP_EOL . (implode(',', $found) . t(' - found')) : '';
+    $notFound = count($notFound) > 0 ? PHP_EOL . (implode(',', $notFound) . ' ' . t(' - not found')) : '';
+    $found = count($found) > 0 ? PHP_EOL . (implode(',', $found) . ' ' . t(' - found')) : '';
     return t("Mite number: @no@bad@ok", ['@no' => $document->get('field_mite_reg_no')->getValue()[0]['value'], '@bad' => $notFound, '@ok' => $found]);
   }
 
