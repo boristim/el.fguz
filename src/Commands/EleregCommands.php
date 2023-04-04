@@ -54,15 +54,9 @@ class EleregCommands extends DrushCommands {
     $this->output->writeln(date('Y-m-d H:i:s') . ": [*] Waiting for messages. To exit press CTRL+C");
     $callback = function (AMQPMessage $msg) {
       $nodeId = intval($msg->body);
+      $phone = '0000000000';
       try {
-        $document = Node::load($nodeId);
-        $message = $this->composeMessage($document);
-        $this->sendTg($message);
-      } catch (Throwable $e) {
-        Drupal::logger('SMS:Telegram')->error($e->getMessage());
-      }
-      try {
-        if ($this->sendSMS($nodeId)) {
+        if ($this->sendSMS($nodeId, $phone)) {
           $this->output->writeln(date('Y-m-d H:i:s') . ': [x] Received ' . $msg->body);
         }
         else {
@@ -70,6 +64,13 @@ class EleregCommands extends DrushCommands {
         }
       } catch (Throwable $e) {
         Drupal::logger('SMS')->error($e);
+      }
+      try {
+        $document = Node::load($nodeId);
+        $message = date('Y-m-d H:i:s') . " $phone:\n" . $this->composeMessage($document);
+        $this->sendTg($message);
+      } catch (Throwable $e) {
+        Drupal::logger('SMS\Telegram')->error($e->getMessage());
       }
     };
     $channel->basic_consume($this->settings['rmq_name'], '', FALSE, TRUE, FALSE, FALSE, $callback);

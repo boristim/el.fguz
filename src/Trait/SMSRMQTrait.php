@@ -21,7 +21,7 @@ trait SMSRMQTrait {
    * @throws EntityStorageException
    * @throws \Exception
    */
-  public function sendSMS(int $id): bool {
+  public function sendSMS(int $id, string &$phone): bool {
     $status = FALSE;
     drupal_flush_all_caches();
     try {
@@ -60,11 +60,17 @@ trait SMSRMQTrait {
         $query = Drupal::entityQuery('node')->condition('type', 'sms')->condition('created', $h24, '>')->condition('field_phone', $phone)->condition('field_status', TRUE)->accessCheck(FALSE);
         $result = $query->execute();
         if (!count($result)) {
-          if ($smsc->send_sms($phone, $message, $this->settings['sender'])) {
-            $status = TRUE;
+          if ((intval($phone) > 79000000000)) {
+            if ($smsc->send_sms($phone, $message, $this->settings['sender'])) {
+              $status = TRUE;
+            }
+            else {
+              Drupal::logger('SMS')->warning('Не удалось отправить СМС на %s', ['%s' => $phone]);
+            }
           }
           else {
-            Drupal::logger('SMS')->warning('Не удалось отправить СМС на %s', ['%s' => $phone]);
+            Drupal::logger('SMS')->warning('Номер %s не мобильный, пропускаем', ['%s' => $phone]);
+            $status = TRUE;
           }
         }
         else {
