@@ -1,8 +1,8 @@
 {
     "name": "boristim/elereg",
     "description": "Medical Registry",
-    "minimum-stability": "stable",
     "license": "MIT",
+    "type": "library",
     "authors": [
         {
             "name": "Boris Tim",
@@ -12,10 +12,12 @@
     "require": {
         "drupal/core-recommended": "^10",
         "drush/drush": "^11.0",
+        "drupal/rabbitmq" : "*",
         "longman/telegram-bot": "^0.80.0",
         "phpoffice/phpspreadsheet": "^1.28",
         "ext-curl": "*",
         "ext-http": "*",
         "ext-sockets": "*"
+
     }
 }
