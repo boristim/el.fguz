@@ -13,12 +13,11 @@
     "require": {
         "drupal/core-recommended": "^10",
         "drush/drush": "^11",
-        "drupal/rabbitmq": "^3",
         "longman/telegram-bot": "^0.80",
         "phpoffice/phpspreadsheet": "^1",
+        "php-amqplib/php-amqplib": "^3.5",
         "ext-curl": "*",
         "ext-http": "*",
         "ext-sockets": "*"
-
     }
 }
