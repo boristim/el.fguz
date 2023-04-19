@@ -5,6 +5,7 @@
 ###### Requirements:
 * Drupal 10
 * php 8.1
+* MariaDB
 * RabbitMQ
 * Python3
 * Supervisor

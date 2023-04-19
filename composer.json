@@ -1,0 +1,21 @@
+{
+    "name": "boristim/elereg",
+    "description": "Medical Registry",
+    "minimum-stability": "stable",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "bdev",
+            "email": "email@example.com"
+        }
+    ],
+    "require": {
+        "drupal/core-recommended": "^10",
+        "drush/drush": "^11.0",
+        "longman/telegram-bot": "^0.80.0",
+        "phpoffice/phpspreadsheet": "^1.28",
+        "ext-curl": "*",
+        "ext-http": "*",
+        "ext-sockets": "*"
+    }
+}
