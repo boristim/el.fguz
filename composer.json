@@ -1,9 +1,13 @@
 {
     "name": "boristim/elereg",
     "description": "Medical Registry",
-    "license": "MIT",
-    "type": "library",
+    "license": "GPL-2.0-or-later",
+    "type": "drupal-module",
     "minimum-stability": "dev",
+    "keywords": [
+        "Drupal",
+        "Medical"
+    ],
     "authors": [
         {
             "name": "Boris Tim",
