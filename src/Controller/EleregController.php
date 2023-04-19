@@ -127,4 +127,20 @@ class EleregController extends ControllerBase {
     return (new JsonResponse())->setData(['log' => $items, 'sent' => $sent]);
   }
 
+  public function mitesSMSGet(Request $request): Response {
+    $regNo = $request->get('n');
+    if (($miteIds = Drupal::entityQuery('node')->condition('type', 'mites')->condition('field_mite_reg_no', $regNo)->accessCheck(FALSE)->execute())
+      && (($smsIds = Drupal::entityQuery('node')->condition('type', 'sms')->condition('field_base_node', reset($miteIds))->sort('changed','DESC')->accessCheck(FALSE)->execute()))
+      && ($sms = Node::load(reset($smsIds)))) {
+      $dt = $sms->get('changed')->getValue()[0]['value'];
+      $dt = Drupal\Core\Datetime\DrupalDateTime::createFromTimestamp($dt)->format('d.m H:i:s');
+      $st = boolval($sms->get('field_status')->getValue()[0]['value']);
+    }
+    else {
+      $dt = '';
+      $st = FALSE;
+    }
+    return (new JsonResponse())->setData(['dt' => $dt, 'st' => $st]);
+  }
+
 }

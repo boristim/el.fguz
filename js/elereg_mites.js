@@ -61,11 +61,24 @@
       let regNo = d.querySelectorAll('td.views-field-field-mite-reg-no')
       if (regNo) {
         regNo.forEach((item) => {
+          let itemNo = item.innerText
           let chk = d.createElement('INPUT')
           chk.setAttribute('type', 'checkbox')
           chk.classList.add('chk-no')
-          chk.setAttribute('name', 's[' + item.innerText + ']')
+          chk.setAttribute('name', 's[' + itemNo + ']')
           item.appendChild(chk)
+          fetch('/admin/mites/sms?n=' + itemNo, {
+            method: 'GET'
+          }).then(response => response.json()).then((resp) => {
+            if (resp['st']) {
+              item.innerHTML = `${itemNo}<span>${resp.dt}</span>`
+            }
+            else {
+              item.innerHTML += `<span>${resp.dt}</span>`
+            }
+          }).catch((reason) => {
+            console.warn(reason)
+          })
         })
         let btn = d.createElement('A')
         btn.classList.add('button--primary')
@@ -89,7 +102,6 @@
             body: data
           })
             .then(response => {
-              // console.log(response.status)
               if (response.status !== 200) {
                 return {'log': 'Some error'}
               }

@@ -63,5 +63,9 @@ html body.elereg--admin-mites .grid-full #block-oliv-content table td, html body
   border-collapse: collapse;
   border-right: 1px solid silver;
 }
+html body.elereg--admin-mites .grid-full #block-oliv-content table td span, html body.elereg--admin-mites .grid-full #block-oliv-content table th span {
+  display: block;
+  white-space: nowrap;
+}
 
 /*# sourceMappingURL=elereg_mite.css.map */

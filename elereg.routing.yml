@@ -31,10 +31,20 @@ elereg.ajax:
     no_cache: TRUE
 
 elereg.mites.sms:
-  methods: [ 'PUT','POST' ]
+  methods: [ 'POST' ]
   path: '/admin/mites/sms'
   defaults:
     _controller: '\Drupal\elereg\Controller\EleregController::mitesSMS'
+  requirements:
+    _permission: 'elereg xls import mites'
+  options:
+    no_cache: TRUE
+
+elereg.mites.sms_log:
+  methods: [ 'GET' ]
+  path: '/admin/mites/sms'
+  defaults:
+    _controller: '\Drupal\elereg\Controller\EleregController::mitesSMSGet'
   requirements:
     _permission: 'elereg xls import mites'
   options:

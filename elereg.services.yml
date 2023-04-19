@@ -24,3 +24,10 @@ services:
     class: Drupal\elereg\Commands\EleregCommands
     tags:
       - { name: drush.command }
+
+  elereg.phone_utils:
+    class: Drupal\elereg\PhoneUtils
+    calls:
+      - [normalize, ['@?']]
+    tags:
+      - { name: elereg.phone_utils }

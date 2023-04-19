@@ -75,6 +75,10 @@ html {
               padding-inline-end: 3px !important;
               border-collapse: collapse;
               border-right: 1px solid silver;
+              span{
+                display: block;
+                white-space: nowrap;
+              }
             }
           }
         }
