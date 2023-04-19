@@ -3,6 +3,7 @@
     "description": "Medical Registry",
     "license": "MIT",
     "type": "library",
+    "minimum-stability": "dev",
     "authors": [
         {
             "name": "Boris Tim",
