@@ -3,7 +3,7 @@
     "description": "Medical Registry",
     "license": "GPL-2.0-or-later",
     "type": "drupal-module",
-    "minimum-stability": "dev",
+    "version": "1.0",
     "keywords": [
         "Drupal",
         "Medical"
@@ -15,7 +15,6 @@
         }
     ],
     "require": {
-        "drupal/core-recommended": "^10",
         "drush/drush": "^11",
         "longman/telegram-bot": "^0.80",
         "phpoffice/phpspreadsheet": "^1",
