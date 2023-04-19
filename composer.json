@@ -12,10 +12,10 @@
     ],
     "require": {
         "drupal/core-recommended": "^10",
-        "drush/drush": "^11.0",
-        "drupal/rabbitmq": "^3.1",
-        "longman/telegram-bot": "^0.80.0",
-        "phpoffice/phpspreadsheet": "^1.28",
+        "drush/drush": "^11",
+        "drupal/rabbitmq": "^3",
+        "longman/telegram-bot": "^0.80",
+        "phpoffice/phpspreadsheet": "^1",
         "ext-curl": "*",
         "ext-http": "*",
         "ext-sockets": "*"
