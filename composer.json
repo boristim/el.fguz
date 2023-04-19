@@ -15,7 +15,6 @@
         }
     ],
     "require": {
-        "drupal/core-recommended": "^10",
         "drush/drush": "^11",
         "longman/telegram-bot": "^0.80",
         "phpoffice/phpspreadsheet": "^1",
